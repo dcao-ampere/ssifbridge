@@ -41,7 +41,7 @@ static constexpr const char* ssifObj =
 class SsifChannel
 {
   public:
-    static constexpr size_t ssifMessageSize = 4096;
+    static constexpr size_t ssifMessageSize = 255;
     static constexpr uint8_t netFnShift = 2;
     static constexpr uint8_t lunMask = (1 << netFnShift) - 1;
 
@@ -137,9 +137,8 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
     uint8_t cmd = rawIter[2];
     if (verbose)
     {
-        log<level::INFO>("Read req msg", entry("NETFN=0x%02x", netfn),
-                         entry("LUN=0x%02x", lun),
-                         entry("CMD=0x%02x", cmd));
+        printf("Read req msg: len=%d, NETFN=0x%02x, LUN=0x%02x, CMD=0x%02x \n",
+                len, netfn, lun, cmd);
     }
     // copy out payload
     std::vector<uint8_t> data(&rawIter[3], rawEnd);
@@ -196,10 +195,9 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
             }
             if (verbose)
             {
-                log<level::INFO>(
-                    "Send rsp msg", entry("NETFN=0x%02x", netfn),
-                    entry("LUN=0x%02x", lun), entry("CMD=0x%02x", cmd),
-                    entry("CC=0x%02x", cc));
+                printf("Send rsp msg: len=%d, NETFN=0x%02x, LUN=0x%02x, CMD=0x%02x, \
+                        CC=0x%02x \n",
+                        payload.size() + 3, netfn, lun, cmd, cc);
             }
             boost::system::error_code ecWr;
             size_t wlen =
@@ -212,6 +210,9 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
                     entry("ERROR=%s", ecWr.message().c_str()),
                     entry("NETFN=0x%02x", netfn), entry("LUN=0x%02x", lun),
                     entry("CMD=0x%02x", cmd), entry("CC=0x%02x", cc));
+                printf("Failed to send rsp msg: SIZE=%d, EXPECT=%d, ERROR=%s, NETFN=0x%02x \
+                        , LUN=0x%02x, CMD=0x%02x, CC=0x%02x\n",
+                        wlen, rsp.size(), ecWr.message().c_str(), netfn, lun, cmd, cc);
             }
         },
         ipmiQueueService, ipmiQueuePath, ipmiQueueIntf, ipmiQueueMethod,
