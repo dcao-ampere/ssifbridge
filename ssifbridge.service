@@ -8,7 +8,7 @@ Restart=always
 RestartSec=10
 TimeoutStartSec=60
 TimeoutStopSec=60
-ExecStart=/usr/bin/ssifbridged
+ExecStart=/usr/bin/ssifbridged -v true
 SyslogIdentifier=ssifbridged
 
 [Install]
