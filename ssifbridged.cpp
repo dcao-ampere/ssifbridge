@@ -144,6 +144,12 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
                 " lun=" + std::to_string(lun) +
                 " cmd=" + std::to_string(cmd);
         log<level::INFO>(msgToLog.c_str());
+        for (int i = 0; i < (rawIter[0] + 1); i++)
+        {
+            std::string msgToLog = "Byte " + std::to_string(i) + " = "
+                    + std::to_string(rawIter[i+3]);
+            log<level::INFO>(msgToLog.c_str());
+        }
     }
     // copy out payload
     std::vector<uint8_t> data(&rawIter[3], rawEnd);
@@ -198,6 +204,12 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
                 {
                     std::copy(payload.cbegin(), payload.cend(),
                               &rspIter[4]);
+                }
+                for (int i = 0; i < (rspIter[0] + 1); i++)
+                {
+                    std::string msgToLog = "Byte Respond " + std::to_string(i) + " = "
+                            + std::to_string(rspIter[i]);
+                    log<level::INFO>(msgToLog.c_str());
                 }
             }
             if (verbose)
